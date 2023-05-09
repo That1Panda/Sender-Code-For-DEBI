@@ -1,0 +1,38 @@
+import socket
+import cv2
+import numpy as np
+
+
+def main():
+    # Define the IP address and port to send data to
+    ip_address = "192.168.0.100"  # Replace with the IP address of the receiver
+    port = 12345  # Replace with the port number used by the receiver
+
+    # Create a socket to send data
+    client_socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
+
+    # Load an example image
+    img = cv2.imread(".jpg")
+
+    # Encode the image as a JPEG byte array
+    encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
+    _, img_bytes = cv2.imencode(".jpg", img, encode_param)
+
+    # Get the number of frames in the image
+    n_frames = len(img_bytes)
+
+    # Send the number of frames to the receiver
+    client_socket.sendto(str(n_frames).encode(), (ip_address, port))
+
+    # Send the image frames to the receiver
+    for i in range(n_frames):
+        frame = img_bytes[i].tobytes()
+        client_socket.sendto(frame, (ip_address, port))
+
+    # Close the socket
+    client_socket.close()
+IMG_4895.jpg
+
+if __name__ == "__main__":
+    main()
+
